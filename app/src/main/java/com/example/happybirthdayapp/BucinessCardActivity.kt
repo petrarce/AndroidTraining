@@ -9,20 +9,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,10 +54,8 @@ fun MainApp(modifier : Modifier = Modifier) {
 
 	Column(modifier = modifier, verticalArrangement = Arrangement.Bottom){
 		Box(modifier = Modifier
-			.padding(bottom = 100.dp)
 			.fillMaxHeight(0.4f)
 			.fillMaxWidth()
-			.border(width = 5.dp, color = Color.Blue)
 			.padding(8.dp)){
 			Column(
 				modifier = Modifier.fillMaxSize(),
@@ -59,10 +64,9 @@ fun MainApp(modifier : Modifier = Modifier) {
 					modifier = Modifier
 						.weight(4f)
 						.fillMaxWidth()
-						.border(width = 5.dp, Color.Blue)
 						.padding(5.dp)
 					, horizontalArrangement = Arrangement.Center){
-					val img = painterResource(id = R.drawable.androidparty);
+					val img = painterResource(id = R.drawable.man_with_beard);
 					Image(
 						modifier = Modifier
 							.padding(8.dp)
@@ -76,10 +80,9 @@ fun MainApp(modifier : Modifier = Modifier) {
 					modifier = Modifier
 						.weight(2f)
 						.fillMaxWidth()
-						.border(width = 5.dp, Color.Blue)
 						.padding(5.dp)
 					, textAlign = TextAlign.Center
-					, text = "Full Name"
+					, text = "Petrarce"
 					, fontSize = 50.sp
 					, fontWeight = FontWeight.Bold
 				);
@@ -87,40 +90,81 @@ fun MainApp(modifier : Modifier = Modifier) {
 					modifier = Modifier
 						.weight(1f)
 						.fillMaxWidth()
-						.border(width = 5.dp, Color.Blue)
 						.padding(5.dp)
 					, textAlign = TextAlign.Center
-					, text = "Title"
+					, text = "C++ Software Engineer"
 					, fontSize = 20.sp
 					, fontWeight = FontWeight.Normal
 				);
 			}
-//			Surface(Modifier.fillMaxSize().padding(5.dp).border(width = 5.dp, color = Color.Cyan)){}
 		}
+		Spacer(modifier =
+			Modifier.height(100.dp))
 		Column(
 				modifier = Modifier
 					.fillMaxHeight(0.5f)
 					.fillMaxWidth()
-					.border(width = 5.dp, color = Color.Blue)
 					.padding(8.dp)) {
-			Surface(modifier = Modifier
+			ContactInformation(modifier = Modifier
 				.fillMaxWidth()
 				.weight(1f)
 				.padding(5.dp)
-				.border(width = 5.dp, color = Color.Cyan)){}
-			Surface(modifier = Modifier
+				, icon = Icons.Filled.Call
+				, info = "+12 3456789012"
+			);
+			ContactInformation(modifier = Modifier
 				.fillMaxWidth()
 				.weight(1f)
 				.padding(5.dp)
-				.border(width = 5.dp, color = Color.Cyan)){}
-			Surface(modifier = Modifier
+				, icon = Icons.Filled.Email
+				, info = "petrarce@gmail.com"
+			);
+			ContactInformation(modifier = Modifier
 				.fillMaxWidth()
 				.weight(1f)
 				.padding(5.dp)
-				.border(width = 5.dp, color = Color.Cyan)){}
+				, icon = Icons.Filled.Share
+				, info = "@AndroidDev"
+			);
+
 		}
 	}
 }
+
+@Composable
+fun ContactInformation(
+	modifier : Modifier = Modifier,
+	info : String = "Contact information",
+	icon : ImageVector = Icons.Filled.Clear
+) {
+
+	Row(modifier = modifier
+		, horizontalArrangement = Arrangement.SpaceBetween){
+		Icon(
+			modifier = Modifier
+				.aspectRatio(1f)
+				.fillMaxHeight()
+				.padding(4.dp)
+			, imageVector = icon
+			, contentDescription = null);
+		Box(modifier = Modifier
+			.align(Alignment.CenterVertically)
+			.fillMaxSize()
+			.padding(4.dp)
+		) {
+			Text(
+				modifier = Modifier
+					.align(Alignment.Center)
+					.padding(4.dp)
+				, text = info
+				, textAlign = TextAlign.Center
+				, fontSize = 20.sp)
+		}
+
+	}
+}
+
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
