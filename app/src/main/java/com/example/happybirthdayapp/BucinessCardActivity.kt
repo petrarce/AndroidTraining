@@ -107,7 +107,8 @@ fun MainApp(modifier : Modifier = Modifier) {
 				modifier = Modifier
 					.fillMaxHeight(0.5f)
 					.fillMaxWidth()
-					.padding(8.dp)) {
+					.padding(8.dp)
+					.padding(start = 32.dp, end = 32.dp)) {
 			ContactInformation(modifier = Modifier
 				.fillMaxWidth()
 				.weight(1f)
