@@ -1,4 +1,5 @@
-package com.example.happybirthdayapp
+package com.example.happybirthdayapp.BusinessCard
+
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.activity.ComponentActivity
@@ -21,6 +22,8 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,16 +36,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.happybirthdayapp.R
+import com.example.happybirthdayapp.ui.theme.HappyBirthdayAppTheme
 
 class BusinessCardActivity : ComponentActivity() {
 
-	override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-		super.onCreate(savedInstanceState, persistentState)
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
 		setContent {
-			MainApp(Modifier.fillMaxSize());
+			HappyBirthdayAppTheme {
+				MainApp(Modifier.fillMaxSize());
+			}
 		}
 	}
-};
+}
 
 @Composable
 fun MainApp(modifier : Modifier = Modifier) {
@@ -165,5 +172,8 @@ fun ContactInformation(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun Preview(){
-	MainApp(Modifier.fillMaxSize());
+	HappyBirthdayAppTheme {
+		MainApp(Modifier.fillMaxSize());
+	}
+
 }
