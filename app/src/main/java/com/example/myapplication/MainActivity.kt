@@ -4,17 +4,26 @@ package com.example.myapplication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -27,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +45,10 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import java.lang.NumberFormatException
 import java.text.NumberFormat
+import kotlin.math.roundToInt
+import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,39 +60,85 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    TimCalculator(modifier = Modifier.fillMaxSize())
+                    TimCalculator(modifier = Modifier.fillMaxSize(), app = this)
                 }
             }
         }
     }
+
+    public var mBillAmount = mutableStateOf<String>("");
+    public var mTipPercentage = mutableStateOf<String>("");
+    public var mRoundUpTip = mutableStateOf<Boolean>(false);
 }
 
 
-fun CalculateTip(billSize: Float, tipPercentage: Float = 0.15f) : String {
-    val amount = billSize * tipPercentage;
-    return NumberFormat.getCurrencyInstance().format(amount);
+fun CalculateTip(billSize: Float, tipPercentage: Float = 0.15f, roundUpTip: Boolean = false) : String {
+    val amount: Float = billSize * tipPercentage;
+    return NumberFormat.getNumberInstance().format(if(!roundUpTip) amount else kotlin.math.ceil(amount));
+}
+
+@Composable
+fun SwitchWithLabel(
+    @StringRes label: Int
+    , checked: Boolean = false
+    , onCheckedChanged: ((Boolean)->Unit)?
+    , modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+        , verticalAlignment = Alignment.CenterVertically
+        , horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = stringResource(id = label));
+        Switch(checked = checked, onCheckedChange = onCheckedChanged);
+    }
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimCalculator(modifier: Modifier = Modifier.fillMaxSize()) {
+fun TimCalculator(modifier: Modifier = Modifier.fillMaxSize(), app: MainActivity? = null) {
     Column(
-        modifier = modifier.padding(16.dp)
+        modifier = modifier
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
         , verticalArrangement = Arrangement.Center
         , horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var billAmount by remember { mutableStateOf(value = ""); }
+        var billAmount by remember { app?.mBillAmount ?: mutableStateOf(""); };
+        var tipPercentage by remember { app?.mTipPercentage ?: mutableStateOf(""); };
+        var roundUpTip by remember { app?.mRoundUpTip ?: mutableStateOf<Boolean>(false); };
         Text(
             modifier = Modifier.align(Alignment.Start)
             , text = stringResource(R.string.calculate_tip)
             , fontSize = 24.sp)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(60.dp))
         EditNumberField(
             modifier = Modifier.fillMaxWidth()
             , fieldValue = billAmount
-            , label = stringResource(R.string.bill_amount)
+            , label = R.string.bill_amount
             , onValueChanged = { billAmount = it }
+            , leadingIcon = R.drawable.money
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(60.dp))
+        EditNumberField(
+            label = R.string.tip_percentage_label
+            , fieldValue = tipPercentage.toString()
+            , onValueChanged = { value ->
+                tipPercentage = value;
+            }
+            , modifier = Modifier.fillMaxWidth()
+            , imeAction = ImeAction.Done
+            , leadingIcon = R.drawable.percent
+        )
+        Spacer(modifier = Modifier.height(60.dp))
+        SwitchWithLabel(
+            modifier = Modifier
+                .fillMaxWidth()
+                .size(48.dp)
+            , checked = roundUpTip
+            , label = R.string.round_up_tip_label
+            , onCheckedChanged = { roundUpTip = it; }
+        );
+        Spacer(modifier = Modifier.height(60.dp))
         Text(
             modifier = Modifier
                 .fillMaxWidth()
@@ -86,20 +146,21 @@ fun TimCalculator(modifier: Modifier = Modifier.fillMaxSize()) {
             , fontSize = 32.sp
             , fontWeight = FontWeight.ExtraBold
             , text = stringResource(R.string.tip_amount
-                , CalculateTip(billAmount.toFloatOrNull() ?: 0f))
+                , CalculateTip(billAmount.toFloatOrNull() ?: 0f, (tipPercentage.toFloatOrNull()?:0f) / 100f, roundUpTip))
             , style = MaterialTheme.typography.displaySmall
-            )
-
+        )
     }
 }
 
 @ExperimentalMaterial3Api
 @Composable
 fun  EditNumberField(
-    modifier: Modifier
-    , fieldValue: String
+    fieldValue: String
+    , @StringRes label: Int
+    , @DrawableRes leadingIcon: Int
     , onValueChanged: (String)->Unit = {}
-    , label: String = "Some label"
+    , imeAction: ImeAction = ImeAction.Next
+    , modifier: Modifier = Modifier
 ) {
     println("Recomposition EditNumberField")
 
@@ -107,13 +168,17 @@ fun  EditNumberField(
         value = fieldValue
         , modifier = modifier
         , onValueChange = onValueChanged
-        , label = { Text(text = label) }
-        , keyboardOptions = KeyboardOptions(
+        , label = { Text(text = stringResource(id = label)) }
+        , leadingIcon = { Icon(painterResource(id = leadingIcon), "") }
+        , keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Number
-            , autoCorrect = false)
+            , autoCorrect = false
+            , imeAction = imeAction)
         , singleLine = true
     );
 }
+
+
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
